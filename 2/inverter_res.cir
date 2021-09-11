@@ -1,0 +1,81 @@
+* nmos characteristics
+
+* include the model files
+.include ./t14y_tsmc_025_level3.txt
+  
+* MOSFET
+* m_instance_name drain_node gate_node source_node bulk_substrate_node model_name L=length W=width
+m1 drain in 0 0 cmosn l=10u w=5u
+* RESISTOR
+rd vdd drain 100k
+* CAPACITOR
+c1 drain 0 10u
+
+* POWER SOURCES
+* v_instance_name posive_node negetive_node value
+v_dd vdd 0 10
+*v_0 vss 0 0
+v_in in 0 2
+
+.control
+  * Sweep R for transfer function
+  foreach r_new 1meg 1k 10k 100k 10meg
+    dc v_in 0 10 0.1
+    alter rd = $r_new
+    run
+  end
+  plot (dc1.drain) (dc2.drain) (dc3.drain) (dc4.drain) (dc5.drain)
+  
+  meas DC v_ol_1 MIN dc1.drain 
+  meas DC v_ol_2 MIN dc2.drain 
+  meas DC v_ol_3 MIN dc3.drain 
+  meas DC v_ol_4 MIN dc4.drain 
+  meas DC v_ol_5 MIN dc5.drain 
+  
+  * Get v_ih and v_il
+  plot deriv(dc1.drain) (-1)
+  let slope = deriv(dc1.drain)
+  meas DC v_il WHEN slope=-1 CROSS=1
+  meas DC v_ih WHEN slope=-1 CROSS=2
+  meas DC v_oh MIN dc1.drain
+  meas DC v_ol MAX dc1.drain 
+  let NMH = v_oh - v_ih
+  let NML = v_il - v_ol
+  print NMH NML
+  
+  * Sweep L for transfer function
+  foreach l_new 1u 2u 5u 10u 20u
+    dc v_in 0 10 0.1
+    altermod m1 l = $l_new
+    run
+  end
+  plot (dc6.drain) (dc7.drain) (dc8.drain) (dc9.drain) (dc10.drain)
+  
+  meas DC v_ol_1 MIN dc6.drain 
+  meas DC v_ol_2 MIN dc7.drain 
+  meas DC v_ol_3 MIN dc8.drain 
+  meas DC v_ol_4 MIN dc9.drain 
+  meas DC v_ol_5 MIN dc10.drain 
+  
+  * Get v_ih and v_il
+  plot deriv(dc5.drain) (-1)
+  
+  * Sweep W for transfer function
+  foreach w_new 1u 2u 5u 10u 20u
+    dc v_in 0 10 0.1
+    altermod m1 w = $w_new
+    run
+  end
+  plot (dc11.drain) (dc12.drain) (dc13.drain) (dc14.drain) (dc15.drain)
+  
+  meas DC v_ol_1 MIN dc11.drain 
+  meas DC v_ol_2 MIN dc12.drain 
+  meas DC v_ol_3 MIN dc13.drain 
+  meas DC v_ol_4 MIN dc14.drain 
+  meas DC v_ol_5 MIN dc15.drain 
+  
+  * Get v_ih and v_il
+  plot deriv(dc11.drain) (-1)
+.endc
+
+

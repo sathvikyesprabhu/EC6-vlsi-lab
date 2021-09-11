@@ -1,0 +1,25 @@
+* transient response of rc circuit
+* Resistor from in to out
+R1 in out 1k
+* Capactitor from out to ground
+C1 out 0 1u
+* Voltage source from in to ground
+* V n+ n- PULSE(V1 V2 TD TR TF PW PER)
+V1 in 0 PULSE(0 3.3 0 100p 100p 5m 10m)
+
+* Sequential block
+.control
+  * Pick resistance from list
+  foreach res 100 1k 10k
+    alter R1=$res
+    * Simulate for this value of R1
+    * transient analysis
+    * .tran tstep tstop <tstart <tmax>> <uic>
+    tran 100u 100m
+    *run
+  end
+  * Plot
+  * Note: Restart ngspice shell
+  plot in tran1.out tran2.out tran3.out
+  meas tran ymax MAX tran2.out rise=2
+.endc

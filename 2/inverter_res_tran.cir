@@ -1,0 +1,74 @@
+* nmos characteristics
+
+* include the model files
+.include ./t14y_tsmc_025_level3.txt
+  
+* MOSFET
+* m_instance_name drain_node gate_node source_node bulk_substrate_node model_name L=length W=width
+m1 drain in 0 0 cmosn l=10u w=10u
+* RESISTOR
+rd vdd drain 10k
+* CAPACITOR
+c1 drain 0 1u
+
+* POWER SOURCES
+* v_instance_name posive_node negetive_node value
+v_dd vdd 0 10
+* V n+ n- PULSE(V1 V2 TD TR TF PW PER)
+v_in in 0 PULSE(0 10 1m 2p 2p 50m 100m)
+
+.control
+  * Sweep R
+  foreach r_new 500 1k 10k
+    dc v_in 0 10 0.1
+    tran 1m 400m
+    alter rd = $r_new
+  end
+  
+  plot (tran1.drain) (tran2.drain) (tran3.drain) (in) 
+  plot -(tran1.drain*tran1.v_dd#branch)
+  
+  meas TRAN r_max MAX tran1.drain
+  meas TRAN r_min MIN tran1.drain
+  let swing = r_max - r_min
+  let swing_01 = r_min + 0.1*swing
+  let swing_09 = r_min + 0.9*swing
+  
+  * rise time
+  meas TRAN t_swing_01 WHEN tran1.drain=swing_01 RISE=1
+  meas TRAN t_swing_09 WHEN tran1.drain=swing_09 RISE=1
+  let t_rise = t_swing_09 - t_swing_01
+  print t_rise
+  
+  * fall time
+  meas TRAN t_swing_01 WHEN tran1.drain=swing_01 FALL=1
+  meas TRAN t_swing_09 WHEN tran1.drain=swing_09 FALL=1
+  let t_fall = t_swing_01 - t_swing_09
+  print t_fall
+  
+  * propagation delay
+  meas TRAN t_in_50_1 WHEN in=5 RISE=1
+  let out_50 = r_min + (0.5*swing)
+  meas TRAN t_out_50_1 WHEN tran1.drain=out_50 FALL=1
+  let t_phl = t_out_50_1 - t_in_50_1
+  
+  meas TRAN t_in_50_2 WHEN in=5 FALL=2
+  let out_50 = r_min + (0.5*swing)
+  meas TRAN t_out_50_2 WHEN tran1.drain=out_50 RISE=2
+  let t_plh = t_out_50_2 - t_in_50_2 
+
+  let prop_delay = (t_plh + t_phl)*0.5
+  print prop_delay
+  
+  * Sweep w
+  foreach w_new 1u 5u 10u
+    dc v_in 0 10 0.1
+    tran 1m 400m
+    alter m1 w = $w_new
+  end
+  
+  plot (tran4.drain) (tran5.drain) (tran6.drain) (in) 
+  
+.endc
+
+

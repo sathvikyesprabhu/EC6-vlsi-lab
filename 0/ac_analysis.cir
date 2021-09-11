@@ -1,0 +1,10 @@
+* Ac analysis
+r 1 2 1
+c 2 0 1
+
+vin 1 0 dc 0 ac 1
+
+* .options noacct
+.ac dec 10 .01 10
+.plot ac vdb(2) xlog
+.end

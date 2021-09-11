@@ -1,0 +1,36 @@
+* nmos characteristics
+
+* include the model file
+.include ./t14y_tsmc_025_level3.txt
+  
+* netlist
+* m_instance_name drain_node gate_node source_node bulk_substrate_node model_name L=length W=width
+m1 vdd in 0 bulk cmosn l=1u w=0.5u 
+
+* power sources
+* v_instance_name positive_node negative_node value
+v_dd vdd 0 3.3 
+v_in in 0 3.3 
+v_sb 0 bulk 1
+
+.control
+  foreach new_vsb 0 1 2 3 
+    dc v_in 0 3.3 0.1
+    alter v_sb = $new_vsb
+    run
+  end
+  
+  plot (-dc1.v_dd#branch) (-dc2.v_dd#branch) (-dc3.v_dd#branch) (-dc4.v_dd#branch)
+.endc
+
+.control
+  foreach new_vsb 0 1 2 3 
+    dc v_dd 0 3.3 0.1
+    alter v_sb = $new_vsb
+    run
+  end
+  
+  plot (-dc5.v_dd#branch) (-dc6.v_dd#branch) (-dc7.v_dd#branch) (-dc8.v_dd#branch)
+.endc
+
+

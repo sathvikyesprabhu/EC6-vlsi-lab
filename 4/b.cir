@@ -1,0 +1,42 @@
+* nmos characteristics
+.include ./t14y_tsmc_025_level3.txt
+
+* NETLIST
+vd out d dc 0
+m1 d g 0 0 cmosn l=0.250u w=1.2u
+vcap out cap dc 0
+cl cap 0 10p
+v_dd vdd 0 dc 5
+vg g 0 dc 5 pulse(0 5 0 0.1u 0.1u 10u 20u)
+
+m2 d g vdd vdd cmosp l=0.250u w=1.9u
+
+.control
+  dc vg 0 5 0.01
+  
+  * DC measurements
+  meas dc vol min d
+  meas dc voh max d
+  let v90 = voh - 0.1 * (voh-vol)
+  let v10 = vol + 0.1 * (voh-vol)
+  let v50 = voh - 0.5 * (voh-vol)
+  
+  * transient response
+  tran 0.1u 40u
+  
+  * transient measurements
+  meas tran trise trig d val=dc.v10 rise=1 targ d val=dc.v90 rise=1
+  meas tran tfall trig d val=dc.v90 fall=1 targ d val=dc.v10 fall=1
+  meas tran tphl trig g val=dc.v50 rise=1 targ d val=dc.v50 fall=1
+  meas tran tplh trig g val=dc.v50 fall=1 targ d val=dc.v50 rise=1
+  let td = 0.5 * (tphl + tplh)
+  print td
+  let power = -5 * (v_dd#branch)
+  meas tran pavg AVG power from=0n to=40u
+  
+  * plots
+  plot (dc.d) 
+  plot (tran1.d) (g)
+  plot (-5*tran1.v_dd#branch)
+  plot (0.5*cap*tran1.d*tran1.d)
+.endc

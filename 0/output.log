@@ -1,0 +1,53 @@
+
+Circuit: * transient response of rc circuit
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Warning: v1: no DC value, transient time 0 value used
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+in                                           0
+out                                          0
+v1#branch                                    0
+
+
+
+No. of Data Rows : 1173
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Warning: v1: no DC value, transient time 0 value used
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+in                                           0
+out                                          0
+v1#branch                                    0
+
+
+
+No. of Data Rows : 1086
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Warning: v1: no DC value, transient time 0 value used
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+in                                           0
+out                                          0
+v1#branch                                    0
+
+
+
+No. of Data Rows : 1086
+Error: no such vector in
+Note: No ".plot", ".print", or ".fourier" lines; no simulations run

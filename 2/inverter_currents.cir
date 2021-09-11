@@ -1,0 +1,38 @@
+* nmos characteristics
+
+* include the model files
+.include ./t14y_tsmc_025_level3.txt
+  
+* MOSFET
+* m_instance_name drain_node gate_node source_node bulk_substrate_node model_name L=length W=width
+m1 out in 0 0 cmosn l=10u w=10u
+vmos out drain 0
+* RESISTOR
+rd vdd drain 10k
+* CAP dummy voltage
+vcap drain vcap_node 0
+* CAPACITOR
+c1 vcap_node 0 1u
+
+
+* POWER SOURCES
+* v_instance_name posive_node negetive_node value
+v_dd vdd 0 10
+
+* V n+ n- PULSE(V1 V2 TD TR TF PW PER)
+v_in in 0 PULSE(0 10 1m 2p 2p 50m 100m)
+
+.control
+  dc v_in 0 10 0.1
+  tran 1m 400m
+  plot (in) 
+  plot (-vcap#branch)
+  plot (-vmos#branch)
+  plot (-v_dd#branch)
+  
+*   meas TRAN v_static MAX (-v_dd#branch)
+  let i_dis = (-vmos#branch) - (-v_dd#branch)
+  plot i_dis
+.endc
+
+
